@@ -1,0 +1,6 @@
+# Secrets
+*.secret
+*accessKeys.csv
+
+# Text
+claude_output.txt
