@@ -9,7 +9,7 @@ variable "environment" {
 }
 
 resource "aws_s3_bucket" "output" {
-  bucket = "${var.project_name}-${var.environment}-output"
+  bucket = "${lower(var.project_name)}-${var.environment}-output"
 
   tags = {
     Project     = var.project_name
@@ -26,6 +26,22 @@ resource "aws_s3_bucket_server_side_encryption_configuration" "output" {
       sse_algorithm = "AES256"
     }
   }
+}
+
+resource "aws_s3_bucket_versioning" "output" {
+  bucket = aws_s3_bucket.output.id
+  versioning_configuration {
+    status = "Enabled"
+  }
+}
+
+resource "aws_s3_bucket_public_access_block" "output" {
+  bucket = aws_s3_bucket.output.id
+
+  block_public_acls       = true
+  block_public_policy     = true
+  ignore_public_acls      = true
+  restrict_public_buckets = true
 }
 
 output "bucket_id" {

@@ -49,6 +49,14 @@ run "table_config" {
     condition     = length(aws_dynamodb_table.jobs.ttl) > 0 && try(one(aws_dynamodb_table.jobs.ttl).enabled, false) == true
     error_message = "TTL must be enabled"
   }
+  assert {
+    condition     = length(aws_dynamodb_table.jobs.server_side_encryption) > 0 && try(one(aws_dynamodb_table.jobs.server_side_encryption).enabled, false) == true
+    error_message = "Table must have server-side encryption enabled"
+  }
+  assert {
+    condition     = length(aws_dynamodb_table.jobs.point_in_time_recovery) > 0 && try(one(aws_dynamodb_table.jobs.point_in_time_recovery).enabled, false) == true
+    error_message = "Table must have point-in-time recovery enabled"
+  }
 }
 
 run "table_tags" {

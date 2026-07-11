@@ -4,6 +4,14 @@ mock_provider "aws" {
       arn = "arn:aws:s3:::mock-output-bucket"
     }
   }
+  mock_resource "aws_s3_bucket_public_access_block" {
+    defaults = {
+      block_public_acls       = true
+      block_public_policy     = true
+      ignore_public_acls      = true
+      restrict_public_buckets = true
+    }
+  }
 }
 
 variables {
@@ -12,14 +20,14 @@ variables {
 }
 
 # ---------------------------------------------------------------------------
-# S3 Output Bucket: name, tags, encryption (no versioning, no CORS)
+# S3 Output Bucket: name, tags, encryption, versioning, public access block
 # ---------------------------------------------------------------------------
 run "bucket_name_and_tags" {
   command = apply
 
   assert {
-    condition     = aws_s3_bucket.output.bucket == "ProjectCerberus-dev-output"
-    error_message = "Output bucket name must be 'ProjectCerberus-dev-output', got '${aws_s3_bucket.output.bucket}'"
+    condition     = aws_s3_bucket.output.bucket == "projectcerberus-dev-output"
+    error_message = "Output bucket name must be 'projectcerberus-dev-output', got '${aws_s3_bucket.output.bucket}'"
   }
   assert {
     condition     = aws_s3_bucket.output.tags["Project"] == "ProjectCerberus"
@@ -41,6 +49,28 @@ run "encryption_aes256" {
   assert {
     condition     = try(one(aws_s3_bucket_server_side_encryption_configuration.output.rule).apply_server_side_encryption_by_default[0].sse_algorithm, "") == "AES256"
     error_message = "Output bucket SSE algorithm must be 'AES256', got '${try(one(aws_s3_bucket_server_side_encryption_configuration.output.rule).apply_server_side_encryption_by_default[0].sse_algorithm, "<missing>")}'"
+  }
+}
+
+run "versioning_enabled" {
+  command = apply
+
+  assert {
+    condition     = one(aws_s3_bucket_versioning.output.versioning_configuration).status == "Enabled"
+    error_message = "Output bucket versioning must be 'Enabled', got '${try(one(aws_s3_bucket_versioning.output.versioning_configuration).status, "<missing>")}'"
+  }
+}
+
+run "public_access_block" {
+  command = apply
+
+  assert {
+    condition     = aws_s3_bucket_public_access_block.output.block_public_acls == true
+    error_message = "Output bucket must block public ACLs"
+  }
+  assert {
+    condition     = aws_s3_bucket_public_access_block.output.block_public_policy == true
+    error_message = "Output bucket must block public bucket policies"
   }
 }
 

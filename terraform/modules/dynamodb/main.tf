@@ -27,6 +27,14 @@ resource "aws_dynamodb_table" "jobs" {
     enabled        = true
   }
 
+  server_side_encryption {
+    enabled = true
+  }
+
+  point_in_time_recovery {
+    enabled = true
+  }
+
   tags = {
     Project     = var.project_name
     Environment = var.environment

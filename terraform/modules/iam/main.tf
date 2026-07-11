@@ -85,20 +85,14 @@ resource "aws_iam_policy" "worker_main" {
         Action = [
           "s3:GetObject"
         ]
-        Resource = [
-          var.input_bucket_arn,
-          "/*"
-        ]
+        Resource = "${var.input_bucket_arn}/*"
       },
       {
         Effect = "Allow"
         Action = [
           "s3:PutObject"
         ]
-        Resource = [
-          var.output_bucket_arn,
-          "/*"
-        ]
+        Resource = "${var.output_bucket_arn}/*"
       },
       {
         Effect = "Allow"
@@ -139,10 +133,7 @@ resource "aws_iam_policy" "frontend_main" {
         Action = [
           "s3:PutObject"
         ]
-        Resource = [
-          var.input_bucket_arn,
-          "/*"
-        ]
+        Resource = "${var.input_bucket_arn}/*"
       },
       {
         Effect = "Allow"

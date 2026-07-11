@@ -15,6 +15,14 @@ mock_provider "aws" {
       }]
     }
   }
+  mock_resource "aws_s3_bucket_public_access_block" {
+    defaults = {
+      block_public_acls       = true
+      block_public_policy     = true
+      ignore_public_acls      = true
+      restrict_public_buckets = true
+    }
+  }
 }
 
 variables {
@@ -30,8 +38,8 @@ run "bucket_name_and_tags" {
   command = apply
 
   assert {
-    condition     = aws_s3_bucket.input.bucket == "ProjectCerberus-dev-input"
-    error_message = "Input bucket name must be 'ProjectCerberus-dev-input', got '${aws_s3_bucket.input.bucket}'"
+    condition     = aws_s3_bucket.input.bucket == "projectcerberus-dev-input"
+    error_message = "Input bucket name must be 'projectcerberus-dev-input', got '${aws_s3_bucket.input.bucket}'"
   }
   assert {
     condition     = aws_s3_bucket.input.tags["Project"] == "ProjectCerberus"
@@ -62,6 +70,23 @@ run "encryption_aes256" {
   assert {
     condition     = try(one(aws_s3_bucket_server_side_encryption_configuration.input.rule).apply_server_side_encryption_by_default[0].sse_algorithm, "") == "AES256"
     error_message = "Input bucket SSE algorithm must be 'AES256', got '${try(one(aws_s3_bucket_server_side_encryption_configuration.input.rule).apply_server_side_encryption_by_default[0].sse_algorithm, "<missing>")}'"
+  }
+}
+
+run "public_access_block" {
+  command = apply
+
+  assert {
+    condition     = aws_s3_bucket_public_access_block.input.block_public_acls == true
+    error_message = "Input bucket must block public ACLs"
+  }
+  assert {
+    condition     = aws_s3_bucket_public_access_block.input.block_public_policy == true
+    error_message = "Input bucket must block public bucket policies"
+  }
+  assert {
+    condition     = aws_s3_bucket_public_access_block.input.restrict_public_buckets == true
+    error_message = "Input bucket must restrict public bucket access"
   }
 }
 

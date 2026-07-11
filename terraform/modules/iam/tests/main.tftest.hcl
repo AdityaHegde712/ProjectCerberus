@@ -251,10 +251,10 @@ run "no_admin_level_permissions" {
   assert {
     condition = alltrue(concat(
       [for stmt in jsondecode(aws_iam_policy.worker_main.policy).Statement :
-       !can(regex("(?i)admin", join(",", try(tolist(stmt.Action), [try(stmt.Action, "")]))))
+        !can(regex("(?i)admin", join(",", try(tolist(stmt.Action), [try(stmt.Action, "")]))))
       ],
       [for stmt in jsondecode(aws_iam_policy.frontend_main.policy).Statement :
-       !can(regex("(?i)admin", join(",", try(tolist(stmt.Action), [try(stmt.Action, "")]))))
+        !can(regex("(?i)admin", join(",", try(tolist(stmt.Action), [try(stmt.Action, "")]))))
       ]
     ))
     error_message = "Neither worker nor frontend policy should contain admin-level actions"
@@ -272,9 +272,7 @@ run "worker_policy_references_correct_arns" {
     condition = anytrue([
       for stmt in jsondecode(aws_iam_policy.worker_main.policy).Statement :
       contains(try(tolist(stmt.Action), [stmt.Action]), "s3:GetObject") &&
-      try(length(stmt.Resource), 0) > 0 &&
-      stmt.Resource[0] == var.input_bucket_arn &&
-      (length(stmt.Resource) < 2 || stmt.Resource[1] == "/*")
+      try(stmt.Resource, "") == "${var.input_bucket_arn}/*"
     ])
     error_message = "Worker S3 GetObject must reference input_bucket_arn (${var.input_bucket_arn}) and allow '/*' objects"
   }
@@ -284,9 +282,7 @@ run "worker_policy_references_correct_arns" {
     condition = anytrue([
       for stmt in jsondecode(aws_iam_policy.worker_main.policy).Statement :
       contains(try(tolist(stmt.Action), [stmt.Action]), "s3:PutObject") &&
-      try(length(stmt.Resource), 0) > 0 &&
-      stmt.Resource[0] == var.output_bucket_arn &&
-      (length(stmt.Resource) < 2 || stmt.Resource[1] == "/*")
+      try(stmt.Resource, "") == "${var.output_bucket_arn}/*"
     ])
     error_message = "Worker S3 PutObject must reference output_bucket_arn (${var.output_bucket_arn}) and allow '/*' objects"
   }
@@ -320,8 +316,7 @@ run "frontend_policy_references_correct_arns" {
     condition = anytrue([
       for stmt in jsondecode(aws_iam_policy.frontend_main.policy).Statement :
       contains(try(tolist(stmt.Action), [stmt.Action]), "s3:PutObject") &&
-      try(length(stmt.Resource), 0) > 0 &&
-      stmt.Resource[0] == var.input_bucket_arn
+      try(stmt.Resource, "") == "${var.input_bucket_arn}/*"
     ])
     error_message = "Frontend S3 PutObject must reference input_bucket_arn (${var.input_bucket_arn})"
   }

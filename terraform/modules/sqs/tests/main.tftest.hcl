@@ -41,6 +41,10 @@ run "job_queue_config" {
     condition     = aws_sqs_queue.jobs.tags["Environment"] == "dev"
     error_message = "Job queue tag Environment must be 'dev'"
   }
+  assert {
+    condition     = aws_sqs_queue.jobs.sqs_managed_sse_enabled == true
+    error_message = "Job queue must have SQS-managed SSE enabled"
+  }
 }
 
 run "redrive_policy" {
