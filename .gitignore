@@ -5,6 +5,8 @@
 # Text
 claude_output.txt
 *study-plan.md
+scratch
+
 # Python cache
 __pycache__/
 *.pyc
@@ -14,3 +16,13 @@ data/
 
 # Editor config
 runtime_config.txt
+
+# Terraform provider binaries (too large for GitHub)
+.terraform/
+terraform/.terraform/
+terraform/modules/*/.terraform/
+*.terraform.lock.hcl
+
+# Terraform state
+*.tfstate
+*.tfstate.*
