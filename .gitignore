@@ -26,4 +26,5 @@ terraform/modules/*/.terraform/
 # Terraform state
 *.tfstate
 *.tfstate.*
-# Internal system artifacts.compactions/
+# Internal system artifacts
+.compactions/
