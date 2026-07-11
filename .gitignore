@@ -4,3 +4,13 @@
 
 # Text
 claude_output.txt
+*study-plan.md
+# Python cache
+__pycache__/
+*.pyc
+
+# Runtime data (local test artifacts)
+data/
+
+# Editor config
+runtime_config.txt

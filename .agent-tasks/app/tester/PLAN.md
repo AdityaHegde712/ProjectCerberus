@@ -26,17 +26,19 @@
 - **Component tests**: React Testing Library for dashboard components
 - **Integration tests**: `pytest` with `boto3` against real AWS resources (tagged `integration`)
 - **E2E tests**: Full pipeline from upload to result verification
-- **Pattern**: Write test → verify it fails (Red) → implementation agent codes (Green) → optional refactor
+- **Pattern**: Write ALL locked tests for a phase first → confirm all fail (Red) → signal orchestrator → wait for implementation → re-run tests → report pass/fail
 
-## TDD Workflow (per TDD Reference)
+## TDD Workflow
 
-All [LOCKED] tests follow strict Red-Green-Refactor:
-1. Write test that defines expected behavior
-2. Run test → confirm failure (Red)
-3. Signal orchestrator: "Tests written, awaiting implementation"
-4. Implementation agent codes until tests pass (Green)
-5. Run tests again → confirm green
-6. Optionally refactor both test and implementation
+All [LOCKED] tests follow this protocol. Tester does NOT modify implementation code:
+
+1. **Write all locked tests** for a phase (e.g., all Phase 1 unit tests)
+2. **Run full test suite** → confirm ALL tests fail (Red) because no implementation exists
+3. **Signal orchestrator**: "All Phase X locked tests written. All fail as expected. Awaiting implementation."
+4. **Wait** for orchestrator to dispatch implementation agents
+5. **Re-run tests** after implementation agents signal completion
+6. **Report results**: which tests pass, which fail, any unexpected behavior
+7. If tests fail → signal orchestrator with failure details. Do NOT fix implementation.
 
 ## Test Directory Structure
 

@@ -13,7 +13,7 @@ class Detection(BaseModel):
     class_id: int
     class_name: str
     confidence: float
-    bbox: tuple[float, float, float, float]  # x1, y1, x2, y2 (normalized)
+    bbox: tuple[float, float, float, float]  # YOLO format: [x_center, y_center, width, height] (normalized 0-1)
 
 class JobInput(BaseModel):
     job_id: str

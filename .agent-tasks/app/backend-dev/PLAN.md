@@ -4,16 +4,15 @@
 
 ## Tasks
 
-### 3.8 — Build lightweight backend API for dashboard queries
+### 3.8 — Build backend API for dashboard queries (Lambda + API Gateway)
 
+- Implementation: **Lambda function behind API Gateway HTTP API** (single choice, no alternatives)
 - API endpoints:
   - `POST /upload` — generate presigned S3 URL + create SQS job message
   - `GET /jobs` — list recent jobs from DynamoDB
   - `GET /jobs/:id` — single job detail + result S3 key
-- Implementation options (choose simplest):
-  - Lambda function behind API Gateway HTTP API
-  - Small Express.js app on EC2 (or local proxy)
-- Recommend: Lambda (avoids managing a server, teaches one more Lambda pattern)
+- Terraform module: `terraform/modules/api-lambda/` (Lambda function + API Gateway + IAM role)
+- Separate from the worker Lambda (Phase 6) — different function, different trigger, same infrastructure pattern
 
 ### 4.1 — Write `poll_and_process.py` (EC2 SQS poller)
 
@@ -54,10 +53,13 @@
 ```
 worker/src/
   poll_and_process.py  -- EC2 SQS poller daemon
-  lambda_handler.py    -- Lambda entry point
+  lambda_handler.py    -- Lambda worker entry point (Phase 6)
 
-backend/
-  api.py               -- API endpoints (or separate Lambda)
+backend/api-lambda/
+  handler.py            -- API Lambda handler (Phase 3 — dashboard backend)
+
+terraform/modules/
+  api-lambda/           -- API Lambda TF module (Phase 3)
 
 docs/comparison-notes/
   ec2-notes.md
